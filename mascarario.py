@@ -1,40 +1,41 @@
 import cv2
 import numpy as np
 
-# Cargar la imagen principal
-img1 = cv2.imread(r'C:\Users\tigre\Downloads\frutas.png')
+path = r'C:\Users\tigre\Downloads\frutas.png'
+img = cv2.imread(path)
+hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-# Cargar la imagen que queremos enmascarar
-img2 = cv2.imread(r'C:\Users\tigre\Downloads\frutas.png')
 
-# Obtener las dimensiones de la segunda imagen (logo)
-rows, cols, channels = img2.shape
+# Amarillo
+lower_yellow = np.array([20, 100, 100])
+upper_yellow = np.array([32, 255, 255])
 
-# Definir la región de interés (ROI) en la imagen principal
-roi = img1[0:rows, 0:cols]
+# Verde
+lower_green = np.array([35, 50, 50])
+upper_green = np.array([85, 255, 255])
 
-# Convertir la imagen del logo a escala de grises
-img2gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+# Rojo
 
-# Crear una máscara binaria a partir de la imagen en escala de grises
-ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
+lower_red1 = np.array([0, 100, 100])
+upper_red1 = np.array([10, 255, 255])
+lower_red2 = np.array([160, 100, 100])
+upper_red2 = np.array([179, 255, 255])
 
-# Invertir la máscara
-mask_inv = cv2.bitwise_not(mask)
 
-# Hacer visible el fondo de la imagen principal en la región del logo
-img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
 
-# Extraer el logo
-img2_fg = cv2.bitwise_and(img2, img2, mask=mask)
+mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
+mask_green = cv2.inRange(hsv, lower_green, upper_green)
 
-# Combinar el fondo y el logo
-dst = cv2.add(img1_bg, img2_fg)
+mask_red_low = cv2.inRange(hsv, lower_red1, upper_red1)
+mask_red_high = cv2.inRange(hsv, lower_red2, upper_red2)
+mask_red = cv2.bitwise_or(mask_red_low, mask_red_high)
 
-# Colocar la imagen combinada en la imagen principal
-img1[0:rows, 0:cols] = dst
 
-# Mostrar la imagen final
-cv2.imshow("Resultado", img1)
+
+cv2.imshow('Frutas colores', img)
+cv2.imshow('mascara amarilla', mask_yellow)
+cv2.imshow('mascara verde', mask_green)
+cv2.imshow('mascara roja ', mask_red)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
