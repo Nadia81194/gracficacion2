@@ -19,6 +19,6 @@ else:
     cv2.imshow(' HSV', hsv)
     cv2.imshow('mascara amarilla', mask)
 
-    print("Segmentación completada. Analizando máscara...")
+    
     cv2.waitKey(0)
     cv2.destroyAllWindows()

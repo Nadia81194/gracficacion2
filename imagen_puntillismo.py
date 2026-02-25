@@ -10,12 +10,12 @@ cantidad3=6
 cantidad=3
 for i in range(tamano):
     for j in range(tamano):
-        img[y_inicio + i, x_inicio + j] = 0 
-        img[y_inicio + i, x_inicio + j + 25] = 0 
-        img[y_inicio + i, x_inicio + j + 50] = 0 
-        img[y_inicio + i + 25, x_inicio + j - 25] = 0 
-        img[y_inicio + i + 50, x_inicio + j - 25] = 0
-        img[y_inicio + i + 75, x_inicio + j] = 0
+        img[y_inicio + i + 75 , x_inicio + j ] = 0
+        img[y_inicio + i + 50 , x_inicio + j + 25] = 0
+        img[y_inicio + i + 25 , x_inicio + j ] = 0
+        img[y_inicio + i, x_inicio + j ] = 0
+        img[y_inicio + i , x_inicio  + j + 100 ] = 0
+        img[y_inicio + i + 25 , x_inicio + j + 100 ] = 0
         img[y_inicio + i + 100, x_inicio + j - 25] = 0
         img[y_inicio + i + 425, x_inicio + j-100 ] = 0
         img[y_inicio + i + 450, x_inicio + j-75 ] = 0
@@ -27,17 +27,55 @@ for i in range(tamano):
         img[y_inicio + i + 600, x_inicio + j+125 ] = 0
         img[y_inicio + i + 200, x_inicio + j+225 ] = 0
         img[y_inicio + i + 200, x_inicio + j+125 ] = 0
+        img[y_inicio + i + 175, x_inicio + j+125 ] = 0
+        img[y_inicio + i + 175, x_inicio + j+225 ] = 0
+        img[y_inicio + i + 175, x_inicio + j+175 ] = 0
+        img[y_inicio + i + 100, x_inicio + j+350 ] = 0
+        img[y_inicio + i + 100, x_inicio + j+375 ] = 0
+        img[y_inicio + i + 125, x_inicio + j + 75 ] = 0
+        img[y_inicio + i + 150, x_inicio + j + 75 ] = 0
+        img[y_inicio + i + 125, x_inicio + j + 100 ] = 0
+        img[y_inicio + i + 150, x_inicio + j + 100 ] = 0
+        img[y_inicio + i + 325, x_inicio + j + 150 ] = 0
+        img[y_inicio + i + 325, x_inicio + j + 125 ] = 0
+        img[y_inicio + i + 350, x_inicio + j + 100 ] = 0
+        img[y_inicio + i + 475, x_inicio + j + 100 ] = 0
+        img[y_inicio + i + 500, x_inicio + j + 125 ] = 0
+        img[y_inicio + i + 500, x_inicio + j + 150 ] = 0
+        img[y_inicio + i + 450, x_inicio + j + 150 ] = 0
+        img[y_inicio + i + 450, x_inicio + j + 200 ] = 0
+        img[y_inicio + i + 425, x_inicio + j + 175 ] = 0
+        img[y_inicio + i + 400, x_inicio + j + 150 ] = 0
+        img[y_inicio + i + 400, x_inicio + j + 200 ] = 0
 
-        
 
+for n in range(4):
 
-for n in range(cantidad1):
+    y_actual = (y_inicio +375 ) + (n * tamano)
+    x_actual = x_inicio +75
+    for i in range(tamano):
+        for j in range(tamano):
+            img[y_actual + i, x_actual + j] = 0
 
-    y_actual = (y_inicio + 125) + (n * tamano)
+for n in range(8):
+
+    y_actual = (y_inicio +100 ) + (n * tamano)
     x_actual = x_inicio - 25 
     for i in range(tamano):
         for j in range(tamano):
             img[y_actual + i, x_actual + j] = 0
+
+for n in range (cantidad):
+    y_actual = y_inicio - 25
+    x_actual = (x_inicio + 25) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+
+for n in range (cantidad):
+    y_actual = y_inicio + 50
+    x_actual = (x_inicio + 100) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
 
 for n in range(cantidad2):
     y_actual = (y_inicio + 300) + (n * tamano)
@@ -155,17 +193,74 @@ for n in range (9):
 
     img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
     y_actual = y_inicio+ 400
-for n in range (cantidad):
+for n in range (10):
     y_actual = y_inicio+ 225
     x_actual = (x_inicio+150) +(n*tamano)
 
     img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+
 for n in range (cantidad):
-    y_actual = y_inicio+ 225
+    y_actual = y_inicio+ 150
+    x_actual = (x_inicio+150) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (6):
+    y_actual = y_inicio+ 200
+    x_actual = (x_inicio+250) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (6):
+    y_actual = y_inicio+ 175
+    x_actual = (x_inicio+250) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (4):
+    y_actual = y_inicio+ 150
+    x_actual = (x_inicio+300) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (cantidad):
+    y_actual = y_inicio+ 125
     x_actual = (x_inicio+325) +(n*tamano)
 
     img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
 
+for n in range (cantidad):
+    y_actual = y_inicio+ 125
+    x_actual = (x_inicio+175) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (cantidad2):
+    y_actual = y_inicio+ 100
+    x_actual = (x_inicio+175) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (8):
+    y_actual = y_inicio+ 75
+    x_actual = (x_inicio+175) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (7):
+    y_actual = y_inicio+ 50
+    x_actual = (x_inicio+175) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+
+for n in range (cantidad2):
+    y_actual = y_inicio+ 25
+    x_actual = (x_inicio+250) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (cantidad2):
+    y_actual = y_inicio
+    x_actual = (x_inicio+250) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
+for n in range (cantidad):
+    y_actual = y_inicio-25
+    x_actual = (x_inicio+275) +(n*tamano)
+
+    img[y_actual : y_actual + tamano, x_actual : x_actual + tamano]=0
 cv.imshow('Monokuma', img)
 cv.waitKey(0)
 cv.destroyAllWindows()
