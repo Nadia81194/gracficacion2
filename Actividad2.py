@@ -1,48 +1,40 @@
 import cv2
 import numpy as np
 
-# Captura de video desde la cámara
-cap = cv2.VideoCapture(0)
-# Permitir que la cámara se estabilice
-cv2.waitKey(2000)
-# Capturar el fondo durante unos segundos
-ret, background = cap.read()
-if not ret:
-    print("Error al capturar el fondo.")
-    cap.release()
-    exit()
+path = r'C:\Users\tigre\Downloads\frutas.png'
+img = cv2.imread(path)
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-    # Convertir el cuadro a espacio de color HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # Definir el rango de color de la tela (verde, en este caso) en HSV
-    lower_green = np.array([0, 40, 40])
-    upper_green = np.array([255, 255, 255])
-    # Crear una máscara que detecta el área verde
-    mask = cv2.inRange(hsv, lower_green, upper_green)
-    # Refinar la máscara (puedes ajustar los parámetros para mejorar la detección)
-    # Invertir la máscara para obtener las áreas que no son verdes
-    mask_inv = cv2.bitwise_not(mask)
-    # Aplicar la máscara a la imagen original para mostrar solo las partes no verdes
-    res1 = cv2.bitwise_and(frame, frame, mask=mask_inv)
+if img is None:
+    print("no carga la imagen otra vez")
+else:
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # Aplicar la máscara al fondo para cubrir las partes verdes
-    res2 = cv2.bitwise_and(background, background, mask=mask)
+    # actividad 1 detectar los colores amarillos
+    lower_yellow = np.array([20, 100, 100])
+    upper_yellow = np.array([35, 255, 255])
+    mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-    # Combinar ambas imágenes
-    final_output = cv2.addWeighted(res1, 1, res2, 1, 0) 
+    # actividad 2 quitar el "ruido"
+    kernel = np.ones((5,5), np.uint8)
+    mask_open = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask_final = cv2.morphologyEx(mask_open, cv2.MORPH_CLOSE, kernel)
 
-    # Mostrar el resultado final
-    cv2.imshow("Capa de Invisibilidad", final_output)
-    cv2.imshow('mask', mask)
+    # actividad 3 conteo
 
-    # Presionar 'q' para salir
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(mask_final)
+    
+    # aqyi se aplica un filtro para que solo cuante las areas grandes de color amerillo para no contar pequeños segmentos
+    conteo = 0
+    for i in range(1, num_labels):
+        area = stats[i, cv2.CC_STAT_AREA]
+        if area > 500: 
+            conteo += 1
 
-# Liberar los recursos
-cap.release()
-cv2.destroyAllWindows()
+    print(f"total del conteo: {conteo}")
+
+    # Mostrar resultados
+    cv2.imshow('mascara original', mask)
+    cv2.imshow('mascara sin ruido', mask_final)
+    
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
