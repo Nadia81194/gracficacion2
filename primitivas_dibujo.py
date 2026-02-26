@@ -3,7 +3,7 @@ import numpy as np
 
 width, height = 800, 500
 
-for i in range(0, 400, 5): # El carro se moverá de 5 en 5 píxeles
+for i in range(0, 400, 5): 
     img = np.ones((height, width, 3), np.uint8) * 200
     
     
@@ -24,7 +24,7 @@ for i in range(0, 400, 5): # El carro se moverá de 5 en 5 píxeles
     # Suelo 
     cv.line(img, (0, 380), (width, 380), (50, 50, 50), 2)
 
-    cv.imshow('Animacion de Carro', img)
+    cv.imshow('bocho rojo', img)
  
     if cv.waitKey(30) & 0xFF == ord('q'):
         break
