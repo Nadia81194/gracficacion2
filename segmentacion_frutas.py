@@ -23,7 +23,7 @@ else:
 
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(mask_final)
     
-    # aqyi se aplica un filtro para que solo cuante las areas grandes de color amerillo para no contar pequeños segmentos
+    # aqui se aplica un filtro para que solo cuante las areas grandes de color amerillo para no contar pequeños segmentos
     conteo = 0
     for i in range(1, num_labels):
         area = stats[i, cv2.CC_STAT_AREA]
