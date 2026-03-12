@@ -21,7 +21,7 @@ options = HandLandmarkerOptions(
 imagen_original = cv2.imread(r'C:\Users\tigre\Downloads\gatito doom.jpg')
 
 # tamaño inicial
-escala = 0.5
+escala = 0.2
 
 cap = cv2.VideoCapture(0)
 
