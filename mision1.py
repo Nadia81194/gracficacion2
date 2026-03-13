@@ -29,7 +29,7 @@ resultado2 = cv2.multiply(img_redim, 50)
 cv2.imshow('MODO RAW', resultado1)
 cv2.imshow('MODO OPENCV', resultado2)
 
-print("Mision cumplida, el codigo es ALBATROS")
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
