@@ -1,76 +1,98 @@
 import cv2
 import mediapipe as mp
 
-# Configuración de la nueva Tasks API
+# 1. Configuración de MediaPipe Tasks
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
 HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-# 1. Crear las opciones del detector (Reemplaza a mp_hands.Hands)
+# 2. DEFINICIÓN DE LA FUNCIÓN (Esto es lo que faltaba)
+def get_letter(hand_landmarks):
+    """
+    Compara la altura (y) de las puntas de los dedos con sus nudillos 
+    para determinar si el dedo está levantado (1) o bajado (0).
+    """
+    fingers = []
+    # Puntas de los dedos: 8(Índice), 12(Medio), 16(Anular), 20(Meñique)
+    # Nudillos correspondientes: 6, 10, 14, 18
+    puntas = [8, 12, 16, 20]
+    nudillos = [6, 10, 14, 18]
+
+    for p, n in zip(puntas, nudillos):
+        # En MediaPipe, el eje Y disminuye hacia arriba
+        if hand_landmarks[p].y < hand_landmarks[n].y:
+            fingers.append(1) # Dedo levantado
+        else:
+            fingers.append(0) # Dedo cerrado
+
+    # Lógica de traducción simplificada
+    if fingers == [0, 0, 0, 0]: return "A"
+    if fingers == [1, 0, 0, 0]: return "1"
+    if fingers == [1, 1, 0, 0]: return "V"
+    if fingers == [1, 1, 1, 1]: return "B"
+    if fingers == [0, 0, 0, 1]: return "I"
+    
+    return "?"
+
+# 3. Opciones del detector
 options = HandLandmarkerOptions(
     base_options=BaseOptions(model_asset_path='hand_landmarker.task'),
-    running_mode=VisionRunningMode.IMAGE, # IMAGE mode funciona igual que el process() anterior
-    num_hands=2,
-    min_hand_detection_confidence=0.5,
-    min_hand_presence_confidence=0.5,
-    min_tracking_confidence=0.5
+    running_mode=VisionRunningMode.IMAGE,
+    num_hands=1,
+    min_hand_detection_confidence=0.7
 )
 
-# Conexiones de la mano para dibujar (Reemplaza a mp_hands.HAND_CONNECTIONS)
-HAND_CONNECTIONS = [
-    (0, 1), (1, 2), (2, 3), (3, 4),       # Pulgar
-    (0, 5), (5, 6), (6, 7), (7, 8),       # Índice
-    (5, 9), (9, 10), (10, 11), (11, 12),  # Medio
-    (9, 13), (13, 14), (14, 15), (15, 16),# Anular
-    (13, 17), (0, 17), (17, 18), (18, 19), (19, 20) # Meñique
-]
+# 4. Variables de control del mensaje
+mensaje = ""
+ultima_letra = ""
+contador_frames = 0
 
-# Captura de video
 cap = cv2.VideoCapture(0)
 
-# 2. Inicializar el detector usando un bloque 'with'
 with HandLandmarker.create_from_options(options) as landmarker:
     while cap.isOpened():
         ret, frame = cap.read()
-        if not ret:
-            break
-
-        # Convertir imagen a RGB
+        if not ret: break
+        
+        frame = cv2.flip(frame, 1)
+        h, w, _ = frame.shape
+        
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        # 3. La nueva API requiere que envolvamos la imagen en un objeto mp.Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
-        
-        # Detectar manos
         results = landmarker.detect(mp_image)
-        
-        # Dibujar los puntos clave y conexiones
-        # En la nueva API, los resultados están en 'hand_landmarks'
+
         if results.hand_landmarks:
             for hand_landmarks in results.hand_landmarks:
-                h, w, c = frame.shape
+                letra_actual = get_letter(hand_landmarks)
                 
-                # Extraer coordenadas a píxeles
-                keypoints = []
-                for landmark in hand_landmarks:
-                    cx, cy = int(landmark.x * w), int(landmark.y * h)
-                    keypoints.append((cx, cy))
-                    # Dibujar el punto
-                    cv2.circle(frame, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
-                    
-                # Dibujar las conexiones (líneas)
-                for connection in HAND_CONNECTIONS:
-                    start_idx = connection[0]
-                    end_idx = connection[1]
-                    cv2.line(frame, keypoints[start_idx], keypoints[end_idx], (0, 255, 0), 2)
+                # Mostrar letra detectada arriba
+                cv2.putText(frame, f"Detectando: {letra_actual}", (50, 60), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
 
-        # Mostrar la imagen
-        cv2.imshow("Salida", frame)
+                # Lógica para "escribir" el mensaje
+                if letra_actual == ultima_letra and letra_actual != "?":
+                    contador_frames += 1
+                    # Si mantienes la seña 15 frames, se agrega al texto
+                    if contador_frames > 15: 
+                        mensaje += letra_actual
+                        ultima_letra = "" 
+                        contador_frames = 0
+                else:
+                    ultima_letra = letra_actual
+                    contador_frames = 0
 
-        # Salir con 'q'
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # Dibujar barra de mensaje en la parte inferior
+        cv2.rectangle(frame, (0, h - 70), (w, h), (40, 40, 40), -1)
+        cv2.putText(frame, f"MENSAJE: {mensaje}", (20, h - 25), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        cv2.imshow("Traductor Real-Time", frame)
+        
+        # Teclas de control
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'): break # Salir
+        if key == ord('c'): mensaje = "" # Borrar mensaje
 
 cap.release()
 cv2.destroyAllWindows()
