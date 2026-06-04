@@ -13,7 +13,7 @@ camera_index = 0
 marker_length_m = 0.10  # tamano del marcador en metros
 aruco_dict = cv2.aruco.DICT_4X4_50
 marker_id = 0  
-window_title = "ra mega acuario minecraft extremo esc salir"
+window_title = "ra mega acuario minecraft cueva extrema esc salir"
 znear, zfar = 0.01, 100.0
 
 calib_npz = Path("camera_ar.npz")
@@ -110,11 +110,11 @@ def draw_cube(size_x: float, size_y: float, size_z: float):
 
 # modelado jerarquico de ajolote estilo minecraft con cola y patas articuladas
 def draw_minecraft_axolotl(t: float, base_color: tuple, detail_color: tuple):
-    swim_angle = np.sin(t * 12.0) * 22.0  # calculo de angulo de nado para la cola
-    leg_angle = np.sin(t * 12.0) * 18.0  # calculo de angulo de braceo para las patas
+    swim_angle = np.sin(t * 12.0) * 22.0  
+    leg_angle = np.sin(t * 12.0) * 18.0  
 
     glPushMatrix()
-    glScalef(0.55, 0.55, 0.55)  # escala el tamano del ajolote
+    glScalef(0.55, 0.55, 0.55)  
     
     # cuerpo principal
     glColor3fv(base_color)
@@ -173,7 +173,7 @@ def draw_tropical_fish(t: float, body_color: tuple, fin_color: tuple):
     glColor3fv(fin_color)
     glPushMatrix(); glTranslatef(0.0, 1.2, -0.2); draw_cube(0.18, 0.7, 1.2); glPopMatrix()
     
-    # cola oscilante
+    # cola 
     glPushMatrix()
     glTranslatef(0.0, 0.0, -1.3)
     glRotatef(tail_swing, 0.0, 1.0, 0.0)
@@ -194,7 +194,7 @@ def draw_kelp(t: float, segments: int, offset_phase: float):
         glTranslatef(0.0, 1.8, 0.0)
     glPopMatrix()
 
-# dibuja el acuario interior, suelo bloques de coral y agua transparente
+# dibuja la escenografia interior del acuario suelo cueva de piedra bloques de coral y agua
 def draw_aquarium(t: float):
     size = 30.0
     
@@ -202,7 +202,14 @@ def draw_aquarium(t: float):
     glColor3f(0.83, 0.78, 0.62)
     glPushMatrix(); glTranslatef(0.0, -14.5, 0.0); draw_cube(29.8, 1.0, 29.8); glPopMatrix()
     
-    # bloques de coral de fuego de tubo y de cerebro
+    # cueva de piedra estilo minecraft en la zona trasera del acuario
+    glColor3f(0.35, 0.35, 0.35) # color gris piedra stone
+    glPushMatrix(); glTranslatef(-10.0, -11.0, -10.0); draw_cube(6.0, 6.0, 6.0); glPopMatrix() # pilar izquierdo cueva
+    glPushMatrix(); glTranslatef(-4.0, -8.0, -10.0); draw_cube(6.0, 4.0, 6.0); glPopMatrix()  # techo central cueva
+    glPushMatrix(); glTranslatef(2.0, -10.0, -10.0); draw_cube(6.0, 8.0, 6.0); glPopMatrix()   # pilar derecho cueva
+    glPushMatrix(); glTranslatef(-11.0, -5.0, -6.0); draw_cube(4.0, 4.0, 4.0); glPopMatrix()   # roca extra superior
+
+    # bloques de coral decorativos sobre el suelo
     glColor3f(0.95, 0.2, 0.2)
     glPushMatrix(); glTranslatef(-3.0, -13.5, -2.0); draw_cube(2.5, 2.5, 2.5); glPopMatrix()
     glColor3f(0.1, 0.3, 0.9)
@@ -211,11 +218,11 @@ def draw_aquarium(t: float):
     glPushMatrix(); glTranslatef(-1.0, -13.5, 5.0); draw_cube(3.0, 1.5, 2.0); glPopMatrix()
 
     # coloca las seis columnas de algas marinas animadas en el fondo
-    glPushMatrix(); glTranslatef(-11.0, -14.0, -11.0); draw_kelp(t, 9, 0.0); glPopMatrix()
+    glPushMatrix(); glTranslatef(-11.0, -14.0, -2.0); draw_kelp(t, 9, 0.0); glPopMatrix()
     glPushMatrix(); glTranslatef(-12.0, -14.0, 6.0); draw_kelp(t, 12, 2.3); glPopMatrix()
     glPushMatrix(); glTranslatef(11.0, -14.0, -9.0); draw_kelp(t, 10, 1.1); glPopMatrix()
     glPushMatrix(); glTranslatef(10.0, -14.0, 10.0); draw_kelp(t, 7, 3.8); glPopMatrix()
-    glPushMatrix(); glTranslatef(-6.0, -14.0, -12.0); draw_kelp(t, 11, 1.5); glPopMatrix()
+    glPushMatrix(); glTranslatef(-6.0, -14.0, 11.0); draw_kelp(t, 11, 1.5); glPopMatrix()
     glPushMatrix(); glTranslatef(12.0, -14.0, -1.0); draw_kelp(t, 8, 0.7); glPopMatrix()
 
     # renderizado del agua usando transparencias de canal alfa alpha blend
@@ -293,6 +300,29 @@ def draw_background_quad(width, height) -> None:
     glMatrixMode(GL_PROJECTION); glPopMatrix()
     glMatrixMode(GL_MODELVIEW); glEnable(GL_DEPTH_TEST)
 
+# calcula la trayectoria de nado y la orientacion automatica del ajolote
+def render_moving_axolotl(t: float, base_color: tuple, detail_color: tuple, seed: float):
+    # calculo de posicion tridimensional usando combinaciones de senos para trayectoria libre
+    x = np.sin(t * 0.4 + seed) * 10.0
+    y = -6.0 + np.sin(t * 0.8 + seed * 2.0) * 4.0
+    z = np.cos(t * 0.5 + seed * 3.0) * 10.0
+
+    # calculo alterno de una posicion ligeramente adelantada para descifrar el vector de direccion
+    dt = 0.05
+    nx = np.sin((t + dt) * 0.4 + seed) * 10.0
+    nz = np.cos((t + dt) * 0.5 + seed * 3.0) * 10.0
+
+    # calcula el angulo de rotacion sobre el eje y usando arcotangente de la direccion de avance
+    dir_x = nx - x
+    dir_z = nz - z
+    angle_y = np.degrees(np.arctan2(dir_x, dir_z))
+
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glRotatef(angle_y, 0.0, 1.0, 0.0) # rota el ajolote para que vea al frente de su nado
+    draw_minecraft_axolotl(t + seed, base_color, detail_color)
+    glPopMatrix()
+
 # funcion principal del programa control del ciclo de renderizado y captura de video
 def main() -> None:
     cap = cv2.VideoCapture(camera_index)
@@ -316,7 +346,7 @@ def main() -> None:
     glfw.make_context_current(window)
     glfw.swap_interval(1)
 
-    # callback para cerrar la aplicacion con la tecla escape o q
+    # cerra ventana con Q
     def on_key(win, key, _scancode, action, _mods):
         if action == glfw.PRESS and key in (glfw.KEY_ESCAPE, glfw.KEY_Q):
             glfw.set_window_should_close(win, True)
@@ -324,7 +354,7 @@ def main() -> None:
 
     glEnable(GL_DEPTH_TEST)
 
-    # definicion de las variables de color para las cinco especies de ajolotes
+    # colores de los ajolotes
     pink_b, pink_d = (1.0, 0.71, 0.75), (1.0, 0.4, 0.6)       
     cyan_b, cyan_d = (0.65, 0.85, 1.0), (1.0, 0.55, 0.7)      
     wild_b, wild_d = (0.45, 0.30, 0.20), (0.25, 0.15, 0.10)   
@@ -343,8 +373,6 @@ def main() -> None:
         upload_frame_texture(frame, w, h)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         draw_background_quad(w, h)
-
-        # codigo ejecutado unicamente si se detecta el marcador aruco id 0
         if corners is not None:
             rvec, tvec = estimate_pose(corners, camera_matrix, dist_coeffs)
             
@@ -358,17 +386,13 @@ def main() -> None:
             glMultMatrixf(MV)
             
             setup_lighting()
-            
-            # escalado global del sistema de ra sobre el marcador
             glPushMatrix()
             glScalef(0.005, 0.005, 0.005) 
             
             t = time.time()
-            
-            # renderiza la pecera con su fondo marino
             draw_aquarium(t)
 
-            # renderizado iterativo del cardumen de peces en sentido horario
+            # renderizado de peces en sentido horario
             for i in range(3):
                 glPushMatrix()
                 angle_offset = i * 120.0
@@ -380,7 +404,7 @@ def main() -> None:
                 else: draw_tropical_fish(t, (0.9, 0.9, 0.1), (0.2, 0.2, 0.8))       
                 glPopMatrix()
 
-            # renderizado iterativo del cardumen de peces en sentido antihorario
+            # renderizado de los peces en sentido antihorario
             for i in range(3):
                 glPushMatrix()
                 angle_offset = i * 120.0 + 60.0
@@ -392,42 +416,17 @@ def main() -> None:
                 else: draw_tropical_fish(t, (0.7, 0.2, 0.9), (0.9, 0.9, 0.9))       
                 glPopMatrix()
 
-            # renderizado individual y posicionamiento de los cinco ajolotes grandes
-            glPushMatrix()
-            glRotatef(t * 30.0, 0.0, 1.0, 0.0)
-            glTranslatef(8.0, -6.5, 0.0) 
-            draw_minecraft_axolotl(t, pink_b, pink_d)
-            glPopMatrix()
-
-            glPushMatrix()
-            glRotatef(-t * 38.0 + 72.0, 0.0, 1.0, 0.0) 
-            glTranslatef(9.0, -2.0, 0.0) 
-            draw_minecraft_axolotl(t + 0.4, cyan_b, cyan_d) 
-            glPopMatrix()
-
-            glPushMatrix()
-            glRotatef(t * 44.0 + 144.0, 0.0, 1.0, 0.0)
-            glTranslatef(7.0, 2.0 + np.cos(t * 2.5) * 2.0, 0.0) 
-            draw_minecraft_axolotl(t + 0.8, wild_b, wild_d)
-            glPopMatrix()
-
-            glPushMatrix()
-            glRotatef(-t * 32.0 + 216.0, 0.0, 1.0, 0.0)
-            glTranslatef(10.0, 5.0 + np.sin(t * 2.0) * 1.5, 0.0) 
-            draw_minecraft_axolotl(t + 1.2, gold_b, gold_d)
-            glPopMatrix()
-
-            glPushMatrix()
-            glRotatef(t * 52.0 + 288.0, 0.0, 1.0, 0.0)
-            glTranslatef(4.5, -1.0 + np.sin(t * 4.0) * 3.0, 0.0) 
-            draw_minecraft_axolotl(t + 1.6, rare_b, rare_d)
-            glPopMatrix()
+            # calculo de recorrido libre tridimensional para los cinco ajolotes
+            render_moving_axolotl(t, pink_b, pink_d, 0.0)
+            render_moving_axolotl(t, cyan_b, cyan_d, 15.0)
+            render_moving_axolotl(t, wild_b, wild_d, 30.0)
+            render_moving_axolotl(t, gold_b, gold_d, 45.0)
+            render_moving_axolotl(t, rare_b, rare_d, 60.0)
             
             glPopMatrix()
 
         glfw.swap_buffers(window)
         glfw.poll_events()
-
     cap.release()
     glfw.terminate()
 
