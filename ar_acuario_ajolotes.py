@@ -8,12 +8,11 @@ import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-# configuracion general
 camera_index = 0
 marker_length_m = 0.10  # tamano del marcador en metros
 aruco_dict = cv2.aruco.DICT_4X4_50
 marker_id = 0  
-window_title = "ra mega acuario minecraft cueva extrema esc salir"
+window_title = "mega acuario minecraft / presione Q para salir"
 znear, zfar = 0.01, 100.0
 
 calib_npz = Path("camera_ar.npz")
